@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  </head>
+  <body>
+    <script>
+      const baseURL = 'http://127.0.0.1:3000'
+      const http = axios.create({ baseURL })
+
+      let onRefresh = false
+
+      // 一般token过期时间是大于当前时间的，这里为了调试直接设置为当前时间+300ms，也就是300ms后过期
+      const tokenExpiredAt = +new Date() + 300
+      let token = 'token'
+
+      http.interceptors.request.use(
+        async function (config) {
+          const getToken = async () => {
+            if (onRefresh === true) {
+              await new Promise((res) => {
+                const sti = setInterval(() => {
+                  if (onRefresh) return
+                  res(true)
+                  clearInterval(sti)
+                }, 50)
+              })
+              return
+            }
+
+            // 过期时间大于当前时间说明不需要刷新token
+            if (tokenExpiredAt > +new Date()) return
+
+            onRefresh = true
+            const newTokenRes = await axios.get(baseURL + '/token/refresh')
+            onRefresh = false
+            token = newTokenRes.data
+          }
+
+          await getToken()
+
+          config.headers['Authorization'] = token
+          console.log(config)
+          return config
+        },
+        function (error) {
+          // 对请求错误做些什么
+          return Promise.reject(error)
+        },
+      )
+
+      const api1 = () => http.get('/pengding', { params: { time: 300 } })
+      const api2 = () => http.get('/pengding', { params: { time: 700 } })
+      const api3 = () => http.get('/pengding', { params: { time: 1000 } })
+      const api4 = () => http.get('/pengding', { params: { time: 301 } })
+      const api5 = () => http.get('/pengding', { params: { time: 400 } })
+
+      const main = async () => {
+        const r1 = await api1()
+        const r2 = api2()
+        const r3 = api3()
+        const r4 = api4()
+        const r5 = api5()
+      }
+      main()
+    </script>
+  </body>
+</html>

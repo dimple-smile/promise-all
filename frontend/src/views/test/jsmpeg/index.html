@@ -1,0 +1,21 @@
+<html>
+  <head lang="zh-CN">
+    <title>JSMpeg Stream Client</title>
+    <style type="text/css">
+      #video-canvas {
+        width: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>jsmpeg</h1>
+    <canvas id="video-canvas"></canvas>
+    <script type="text/javascript" src="./jsmpeg.min.js"></script>
+    <script type="text/javascript">
+      const search = new URLSearchParams(location.search)
+      var canvas = document.getElementById('video-canvas')
+      var url = search.get('url')
+      var player = new JSMpeg.Player(url, { canvas: canvas })
+    </script>
+  </body>
+</html>
