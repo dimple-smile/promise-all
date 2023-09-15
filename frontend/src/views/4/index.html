@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>useEcharts</title>
+    <script src="./vue.global.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/element-plus/dist/index.css" />
+    <script src="https://cdn.jsdelivr.net/npm/element-plus"></script>
+  </head>
+  <body>
+    <div id="app">
+      <el-button @click="dialogVisible = true"> click to open the Dialog </el-button>
+      <el-dialog v-model="dialogVisible" title="Tips" width="30%">
+        <span>This is a message</span>
+        <template #footer>
+          <span class="dialog-footer">
+            <el-button @click="handleCancel">Cancel</el-button>
+            <el-button type="primary" @click="handleConfirm"> Confirm </el-button>
+          </span>
+        </template>
+      </el-dialog>
+    </div>
+
+    <script type="module">
+      const { createApp, ref, onMounted, shallowRef, watch } = Vue
+
+      const App = {
+        setup() {
+          const dialogVisible = ref(false)
+          const handleConfirm = () => {
+            dialogVisible.value = false
+          }
+          const handleCancel = () => {
+            dialogVisible.value = false
+          }
+          return { dialogVisible, handleConfirm, handleCancel }
+        },
+      }
+
+      const app = createApp(App)
+      app.use(ElementPlus)
+      app.mount('#app')
+    </script>
+  </body>
+</html>

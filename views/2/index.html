@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>useEcharts</title>
+    <script src="./vue.global.min.js"></script>
+    <script src="./echarts.min.js"></script>
+  </head>
+  <body>
+    <div id="app">
+      <div ref="domRef" style="width: 100%; height: 400px"></div>
+    </div>
+
+    <script type="module">
+      const { createApp, ref, onMounted, shallowRef, watch } = Vue;
+
+      const App = {
+        setup() {
+          const domRef = ref(null);
+          onMounted(() => {
+            const myChart = echarts.init(domRef.value);
+            myChart.setOption({
+              title: { text: "ECharts 入门示例" },
+              tooltip: {},
+              xAxis: {
+                data: ["衬衫", "羊毛衫", "雪纺衫", "裤子", "高跟鞋", "袜子"],
+              },
+              yAxis: {},
+              series: [
+                {
+                  name: "销量",
+                  type: "bar",
+                  data: [5, 20, 36, 10, 10, 20],
+                },
+              ],
+            });
+          });
+        },
+      };
+
+      const App2 = {
+        setup() {
+          const useEcharts = () => {
+            const domRef = ref(null);
+            const myChart = shallowRef(null);
+
+            const initPromise = async () => {
+              if (domRef.value !== null) return;
+              await new Promise((resolve) =>watch(() => domRef.value, resolve));
+              myChart.value = echarts.init(domRef.value);
+            };
+
+            const setOption = async (option) => {
+              await initPromise();
+              myChart.value.setOption(option);
+            };
+
+            const o = new ResizeObserver(() => {
+              myChart.value?.resize();
+            });
+            initPromise().then(() => {
+              o.observe(domRef.value);
+            });
+
+            return { domRef, setOption, myChart };
+          };
+
+          const { domRef, setOption } = useEcharts();
+
+          setOption({
+            title: { text: "ECharts 入门示例" },
+            tooltip: {},
+            xAxis: {
+              data: ["衬衫", "羊毛衫", "雪纺衫", "裤子", "高跟鞋", "袜子"],
+            },
+            yAxis: {},
+            series: [
+              {
+                name: "销量",
+                type: "bar",
+                data: [5, 20, 36, 10, 10, 20],
+              },
+            ],
+          });
+
+          return { domRef };
+        },
+      };
+
+      createApp(App2).mount("#app");
+    </script>
+  </body>
+</html>
